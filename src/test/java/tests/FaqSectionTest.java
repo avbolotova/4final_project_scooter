@@ -1,69 +1,41 @@
 package tests;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.TestConfig;
+import pages.MainPage;
 import pages.FaqSection;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.*;
 
-public class FaqSectionTest {
+@RunWith(Parameterized.class)
+public class FaqSectionTest extends BaseTest {
 
-    private WebDriver driver;
-
-    @Before
-    public void setUp() {
-        String browser = System.getProperty("browser", "chrome");
-        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
-
-        switch (browser.toLowerCase()) {
-            case "firefox":
-                WebDriverManager.firefoxdriver().setup();
-                FirefoxOptions ff = new FirefoxOptions();
-                if (headless) ff.setHeadless(true);
-                driver = new FirefoxDriver(ff);
-                break;
-            case "chrome":
-            default:
-                WebDriverManager.chromedriver().setup();
-                ChromeOptions ch = new ChromeOptions();
-                if (headless) ch.addArguments("--headless");
-                ch.addArguments("--remote-allow-origins=*");
-                driver = new ChromeDriver(ch);
-                break;
-        }
+    @Parameterized.Parameters(name = "FAQ index={0}")
+    public static Object[][] data() {
+        return new Object[][]{
+                {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}
+        };
     }
 
-    @After
-    public void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
+    @Parameterized.Parameter
+    public int index;
 
     @Test
     public void questionShouldExpandAndShowAnswer() {
-        driver.get("https://qa-scooter.praktikum-services.ru/");
+        driver.get(TestConfig.BASE_URL);
+        MainPage main = new MainPage(driver);
+        main.closeCookiesIfPresent();
+
         FaqSection faq = new FaqSection(driver);
-        faq.scrollIntoView();
-        faq.collapse();
-        assertFalse("Ожидали, что вопрос свернут", faq.isExpanded());
-        faq.expand();
 
-        new WebDriverWait(driver, 5)
-                .until(ExpectedConditions.visibilityOfElementLocated(By.id("accordion__panel-0")));
+        faq.scrollIntoView(index);
+        faq.expand(index);
 
-        assertTrue("После клика вопрос должен быть раскрыт", faq.isExpanded());
-        String answer = faq.getAnswerText();
+        assertTrue("После клика вопрос должен быть раскрыт", faq.isExpanded(index));
+        assertTrue("Ответ должен быть видимым", faq.isAnswerVisible(index));
+        String answer = faq.getAnswerText(index);
         assertNotNull("Ответ не должен быть null", answer);
         assertFalse("Ответ не должен быть пустым", answer.trim().isEmpty());
     }

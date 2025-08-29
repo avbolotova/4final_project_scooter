@@ -5,14 +5,18 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import pages.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import pages.MainPage;
+import pages.OrderConfirmModal;
+import pages.OrderCreatedModal;
+import pages.OrderStepOnePage;
+import pages.OrderStepTwoPage;
 
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-public class OrderPageTest {
+public class OrderPageTest extends BaseTest {
 
     private WebDriver driver;
 
@@ -36,27 +40,12 @@ public class OrderPageTest {
         };
     }
 
-    @Before
-    public void setUp() {
-        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
-
-        WebDriverManager.firefoxdriver().setup();
-        FirefoxOptions ff = new FirefoxOptions();
-        if (headless) ff.setHeadless(true);
-        driver = new FirefoxDriver(ff);
-        driver.manage().window().maximize();
-    }
-
-    @After
-    public void tearDown() {
-        if (driver != null) driver.quit();
-    }
-
     /** Позитивный сценарий заказа самоката с параметрами */
     @Test
     public void orderPositiveFlow() {
         MainPage main = new MainPage(driver);
         main.open();
+        main.closeCookiesIfPresent();
 
         if ("top".equalsIgnoreCase(entryPoint)) {
             main.clickOrderTop();
