@@ -2,15 +2,11 @@ package pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class OrderStepTwoPage {
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class OrderStepTwoPage extends OrderStepOnePage {
 
     public OrderStepTwoPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, 10);
+        super(driver);
     }
 
     private final By date = By.xpath("//input[@placeholder='* Когда привезти самокат']");
@@ -30,7 +26,8 @@ public class OrderStepTwoPage {
         return this;
     }
     public OrderStepTwoPage selectPeriod(String text){
-        click(periodControl); click(periodOption(text));
+        click(periodControl);
+        click(periodOption(text));
         wait.until(ExpectedConditions.textToBePresentInElementLocated(selectedPeriod, text));
         return this;
     }
@@ -41,21 +38,14 @@ public class OrderStepTwoPage {
         if (lc.contains("серая"))  toggle(grey);
         return this;
     }
-    public OrderStepTwoPage setComment(String v){ type(comment, v); return this; }
+    public OrderStepTwoPage setComment(String v){
+        type(comment, v);
+        return this;
+    }
 
     public OrderConfirmModal clickOrder(){
         click(orderBtn);
         return new OrderConfirmModal(driver);
-    }
-
-    private void type(By loc, String text){
-        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(loc));
-        el.clear(); if(text!=null && !text.isEmpty()) el.sendKeys(text);
-    }
-    private void click(By loc){
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(loc));
-        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView({block:'center'});", el);
-        el.click();
     }
     private void toggle(By loc){
         WebElement cb = wait.until(ExpectedConditions.elementToBeClickable(loc));
