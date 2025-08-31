@@ -11,7 +11,7 @@ public class MainPage {
 
     public MainPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 10); // без Duration
+        this.wait = new WebDriverWait(driver, 10);
     }
 
     // Кнопки «Заказать» на главной
@@ -21,8 +21,30 @@ public class MainPage {
     // Кнопка куков «Да все привыкли» на главной
     private final By cookieButton = By.id("rcc-confirm-button");
 
-    // Блок FAQ
-    private final By faqSection = By.id("accordion");
+    // Вопросы на главной
+    public static final By faqCostAndPaymentQuestion   = By.id("accordion__heading-0");
+    public static final By faqCostAndPaymentAnswer     = By.id("accordion__panel-0");
+
+    public static final By faqMultipleScootersQuestion = By.id("accordion__heading-1");
+    public static final By faqMultipleScootersAnswer   = By.id("accordion__panel-1");
+
+    public static final By faqRentTimeQuestion         = By.id("accordion__heading-2");
+    public static final By faqRentTimeAnswer           = By.id("accordion__panel-2");
+
+    public static final By faqSameDayOrderQuestion     = By.id("accordion__heading-3");
+    public static final By faqSameDayOrderAnswer       = By.id("accordion__panel-3");
+
+    public static final By faqExtendOrReturnQuestion   = By.id("accordion__heading-4");
+    public static final By faqExtendOrReturnAnswer     = By.id("accordion__panel-4");
+
+    public static final By faqChargerIncludedQuestion  = By.id("accordion__heading-5");
+    public static final By faqChargerIncludedAnswer    = By.id("accordion__panel-5");
+
+    public static final By faqCancelOrderQuestion      = By.id("accordion__heading-6");
+    public static final By faqCancelOrderAnswer        = By.id("accordion__panel-6");
+
+    public static final By faqOutsideMKADQuestion      = By.id("accordion__heading-7");
+    public static final By faqOutsideMKADAnswer        = By.id("accordion__panel-7");
 
     public void open() {
         driver.get(TestConfig.BASE_URL);
@@ -31,9 +53,9 @@ public class MainPage {
 
     public void closeCookiesIfPresent() {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, 3);
-            WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(cookieButton));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click()", btn);
+            WebElement btn = new WebDriverWait(driver, 3)
+                    .until(ExpectedConditions.elementToBeClickable(cookieButton));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click()", btn);
         } catch (TimeoutException ignore) {
         }
     }
@@ -48,11 +70,6 @@ public class MainPage {
         bottom.click();
     }
 
-    public void scrollFaqIntoView() {
-        WebElement faq = wait.until(ExpectedConditions.visibilityOfElementLocated(faqSection));
-        scrollIntoView(faq);
-    }
-
     private void waitAndClick(By locator) {
         WebElement el = wait.until(ExpectedConditions.elementToBeClickable(locator));
         scrollIntoView(el);
@@ -60,6 +77,39 @@ public class MainPage {
     }
 
     private void scrollIntoView(WebElement el) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", el);
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView({block:'center'});", el);
+    }
+
+    public void scrollFaqQuestionIntoView(By faqQuestion) {
+        WebElement q = wait.until(ExpectedConditions.presenceOfElementLocated(faqQuestion));
+        scrollIntoView(q);
+    }
+
+    /** Клик по вопросу */
+    public void clickFaqQuestion(By faqQuestion) {
+        WebElement q = wait.until(ExpectedConditions.elementToBeClickable(faqQuestion));
+        scrollIntoView(q);
+        q.click();
+    }
+
+    /** Текущее состояние раскрытия */
+    public boolean isFaqQuestionExpanded(By faqQuestion) {
+        WebElement q = wait.until(ExpectedConditions.presenceOfElementLocated(faqQuestion));
+        String expanded = q.getAttribute("aria-expanded");
+        return "true".equalsIgnoreCase(expanded);
+    }
+
+    /** Текст ответа из панели */
+    public String getFaqAnswerText(By faqAnswerPanel) {
+        WebElement panel = wait.until(ExpectedConditions.visibilityOfElementLocated(faqAnswerPanel));
+        return panel.getText().trim();
+    }
+
+    /** Раскрыть (кликнуть, если свернут) */
+    public void expandFaq(By faqQuestion) {
+        if (!isFaqQuestionExpanded(faqQuestion)) {
+            clickFaqQuestion(faqQuestion);
+        }
     }
 }

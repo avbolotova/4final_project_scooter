@@ -22,18 +22,26 @@ public abstract class BaseTest {
             case "firefox":
                 WebDriverManager.firefoxdriver().setup();
                 FirefoxOptions ff = new FirefoxOptions();
-                if (headless) ff.addArguments("-headless");
+                if (headless) {
+                    ff.addArguments("-headless");
+                }
                 driver = new FirefoxDriver(ff);
                 break;
+
             case "chrome":
             default:
                 WebDriverManager.chromedriver().setup();
-                ChromeOptions ch = new ChromeOptions();
-                if (headless) ch.addArguments("--headless=new");
-                ch.addArguments("--window-size=1920,1080");
-                driver = new ChromeDriver(ch);
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("--no-sandbox");
+                options.addArguments("--disable-dev-shm-usage");
+                if (headless) {
+                    options.addArguments("--headless");
+                }
+                driver = new ChromeDriver(options);
                 break;
         }
+
+        driver.manage().window().maximize();
     }
 
     @After

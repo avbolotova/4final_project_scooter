@@ -1,12 +1,8 @@
 package tests;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import pages.MainPage;
 import pages.OrderConfirmModal;
 import pages.OrderCreatedModal;
@@ -17,8 +13,6 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class OrderPageTest extends BaseTest {
-
-    private WebDriver driver;
 
     // Параметры данных заказа
     @Parameterized.Parameter(0) public String entryPoint;
@@ -45,7 +39,6 @@ public class OrderPageTest extends BaseTest {
     public void orderPositiveFlow() {
         MainPage main = new MainPage(driver);
         main.open();
-        main.closeCookiesIfPresent();
 
         if ("top".equalsIgnoreCase(entryPoint)) {
             main.clickOrderTop();

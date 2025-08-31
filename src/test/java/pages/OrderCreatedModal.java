@@ -19,8 +19,4 @@ public class OrderCreatedModal {
     public boolean isVisible(){
         return wait.until(ExpectedConditions.visibilityOfElementLocated(header)).isDisplayed();
     }
-
-    public void clickSeeStatus(){
-        wait.until(ExpectedConditions.elementToBeClickable(seeStatus)).click();
-    }
 }

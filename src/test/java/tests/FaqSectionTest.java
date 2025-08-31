@@ -1,42 +1,45 @@
 package tests;
 
-import pages.TestConfig;
-import pages.MainPage;
-import pages.FaqSection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.openqa.selenium.By;
+import pages.MainPage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class FaqSectionTest extends BaseTest {
 
-    @Parameterized.Parameters(name = "FAQ index={0}")
+    @Parameterized.Parameter(0)
+    public By question;
+
+    @Parameterized.Parameter(1)
+    public By answer;
+
+    @Parameterized.Parameters(name = "FAQ {index}")
     public static Object[][] data() {
         return new Object[][]{
-                {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}
+                {MainPage.faqCostAndPaymentQuestion,   MainPage.faqCostAndPaymentAnswer},
+                {MainPage.faqMultipleScootersQuestion, MainPage.faqMultipleScootersAnswer},
+                {MainPage.faqRentTimeQuestion,         MainPage.faqRentTimeAnswer},
+                {MainPage.faqSameDayOrderQuestion,     MainPage.faqSameDayOrderAnswer},
+                {MainPage.faqExtendOrReturnQuestion,   MainPage.faqExtendOrReturnAnswer},
+                {MainPage.faqChargerIncludedQuestion,  MainPage.faqChargerIncludedAnswer},
+                {MainPage.faqCancelOrderQuestion,      MainPage.faqCancelOrderAnswer},
+                {MainPage.faqOutsideMKADQuestion,      MainPage.faqOutsideMKADAnswer}
         };
     }
 
-    @Parameterized.Parameter
-    public int index;
-
     @Test
-    public void questionShouldExpandAndShowAnswer() {
-        driver.get(TestConfig.BASE_URL);
+    public void faqQuestion_ShouldShowNonEmptyAnswer() {
         MainPage main = new MainPage(driver);
-        main.closeCookiesIfPresent();
+        main.open();
 
-        FaqSection faq = new FaqSection(driver);
+        main.scrollFaqQuestionIntoView(question);
+        main.expandFaq(question);
 
-        faq.scrollIntoView(index);
-        faq.expand(index);
-
-        assertTrue("После клика вопрос должен быть раскрыт", faq.isExpanded(index));
-        assertTrue("Ответ должен быть видимым", faq.isAnswerVisible(index));
-        String answer = faq.getAnswerText(index);
-        assertNotNull("Ответ не должен быть null", answer);
-        assertFalse("Ответ не должен быть пустым", answer.trim().isEmpty());
+        String text = main.getFaqAnswerText(answer);
+        assertTrue("Ожидали непустой текст ответа", text != null && !text.trim().isEmpty());
     }
 }
